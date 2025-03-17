@@ -4,12 +4,12 @@ import math
 
 class SensorPairer:
     
-    def __init__(self, sensor1_info, sensor2_info):
+    def __init__(self, sensor1_csv_file, sensor2_json_file):
         """
         Initialize with sensor info and parameter2 info.
         """
-        self.sensor1_info = sensor1_info
-        self.sensor2_info = sensor2_info
+        self.sensor1_info = self.__csv_to_dict(sensor1_csv_file)
+        self.sensor2_info = self.__import_json_to_dict_list(sensor2_json_file)
         self.paired_sensor_ids = {}
 
     def _generate_paired_sensor_ids_json(self, file_name):
@@ -18,9 +18,7 @@ class SensorPairer:
         
         :param file_name: The name of the file to save the JSON data
         """
-        # Open the file for writing
         with open(file_name, mode='w', encoding='utf-8') as file:
-            # Use json.dump to write the paired_sensor_ids dictionary as JSON
             json.dump(self.paired_sensor_ids, file, indent=4)
         
     def _pair_sensors(self, threshold):
@@ -41,14 +39,14 @@ class SensorPairer:
         
         #pairs the current sensor 1 reading id with the first sensor2 reading id where the distance between points is withing threshold
         for reading1 in self.sensor1_info:
-            lat1 = float(reading1[lat_key])  # Convert latitude to float
-            long1 = float(reading1[long_key])  # Convert longitude to float
+            lat1 = float(reading1[lat_key])  
+            long1 = float(reading1[long_key]) 
             
             for reading2 in self.sensor2_info:
                 
 
-                lat2 = float(reading2[lat_key])  # Convert latitude to float
-                long2 = float(reading2[long_key])  # Convert longitude to float
+                lat2 = float(reading2[lat_key])  
+                long2 = float(reading2[long_key]) 
                 
                 #if distance is within threshold and the sensor 1 id isnt already paired then add new pair
                 if self._distance_between_points_in_meters(lat1, long1, lat2, long2) <= threshold:
@@ -79,7 +77,7 @@ class SensorPairer:
         
         return R * c 
 
-    def csv_to_dict(csv_file):
+    def __csv_to_dict(self, csv_file):
         """
         Convert a CSV file into a list of dictionaries.
         Each row in the CSV will be converted to a dictionary where the keys are the column headers.
@@ -96,7 +94,7 @@ class SensorPairer:
     
     import json
 
-    def import_json_to_dict_list(json_file):
+    def __import_json_to_dict_list(self, json_file):
         """
         Convert a JSON file into a list of dictionaries.
         
@@ -107,20 +105,3 @@ class SensorPairer:
             data = json.load(file)
             
         return data
-
-
-if __name__ == "__main__":
-
-
-    csv_file_path1 = 'SensorData1.csv'
-    sensor1Info = SensorPairer.csv_to_dict(csv_file_path1)
-    
-    json_file_path = 'SensorData2.json'
-    sensor2Info = SensorPairer.import_json_to_dict_list(json_file_path)
-    
-    # Print the resulting list of dictionaries
-    var = SensorPairer(sensor1Info, sensor2Info)
-    res = var._pair_sensors(100)
-    print(var.paired_sensor_ids)
-    
-    var._generate_paired_sensor_ids_json("test")
