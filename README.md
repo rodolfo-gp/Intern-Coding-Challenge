@@ -61,3 +61,5 @@ After processing the sensor data, the solution generates a `solution_output.json
 }
 
 ```
+
+To test it for yourself you can run the main.py file
